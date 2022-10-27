@@ -40,7 +40,6 @@ export class TodosAccess {
     return todo
   }
 
-
   async updateTodo(todoUpdate: TodoUpdate): Promise<TodoUpdate> {
     // TodoUpdate:
     // todoId: string
@@ -59,9 +58,27 @@ export class TodosAccess {
         ":name": name,
       },
     };
+
     await this.docClient.update(params).promise()
 
     return todoUpdate
+  }
+
+  async deleteTodo(todoId: string): Promise<void> {
+
+    const params = {
+      TableName: this.todosTable,
+      Key: {
+        todoId
+      },
+    };
+    
+    try {
+      await this.docClient.delete(params).promise()
+      console.log(`Success - todoId ${todoId} deleted`);
+    } catch (err) {
+      console.log("Error", err);
+    }
   }
 }
 
