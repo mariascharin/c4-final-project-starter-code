@@ -8,6 +8,7 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import * as uuid from 'uuid'
 //import * as createError from 'http-errors'
 //import { getUserId } from '../auth/jwtUtils';
+//import { TodoUpdate } from '../models/TodoUpdate';
 
 const todosAccess = new TodosAccess()
 
@@ -37,22 +38,23 @@ export async function createTodo(
 }
 
 export async function updateTodo(
-    updateTodoRequest: UpdateTodoRequest
-): Promise<UpdateTodoRequest> {
+    todoId: string, todoUpdate: UpdateTodoRequest
+): Promise<void> {
   //const userId = getUserId(jwtToken)
-  const { todoId, name, dueDate, done } = updateTodoRequest
-  const todoUpdate = {
-    todoId,
-    name,
-    dueDate,
-    done,
-  }
-  return await todosAccess.updateTodo(todoUpdate)
+  
+  return await todosAccess.updateTodo(todoId, todoUpdate)
+}
+
+export async function updateImageUrl(
+  todoId: string
+): Promise<string> {
+  const imageId = uuid.v4()
+  await todosAccess.updateImageUrl(todoId, imageId)
+  return imageId
 }
 
 export async function deleteTodo(
   todoId: string
 ): Promise<void> {
-  await todosAccess.deleteTodo(todoId)
-  return null
+  return await todosAccess.deleteTodo(todoId)
 }

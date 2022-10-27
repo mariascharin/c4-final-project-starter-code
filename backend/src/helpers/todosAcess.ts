@@ -40,18 +40,19 @@ export class TodosAccess {
     return todo
   }
 
-  async updateTodo(todoUpdate: TodoUpdate): Promise<TodoUpdate> {
-    // TodoUpdate:
-    // todoId: string
-    // dueDate: string
-    // done: boolean
-    const { todoId, name, dueDate, done } = todoUpdate
+  async updateTodo(todoId: string, todoUpdate: TodoUpdate): Promise<void> {
+    const { name, dueDate, done } = todoUpdate
     const params = {
       TableName: this.todosTable,
       Key: {
         todoId: todoId
       },
       UpdateExpression: "set #dueDate = :dueDate, #done = :done, #name = :name",
+      ExpressionAttributeNames: {
+          '#dueDate': 'dueDate',
+          '#done': 'done',
+          '#name': 'name',
+      },
       ExpressionAttributeValues: {
         ":dueDate": dueDate,
         ":done": done,
@@ -59,9 +60,41 @@ export class TodosAccess {
       },
     };
 
-    await this.docClient.update(params).promise()
+    try {
+      await this.docClient.update(params).promise()
+      console.log(`Success - todoId ${todoId} updated`);
+    } catch (err) {
+      console.log("Error", err);
+    }
 
-    return todoUpdate
+    return null
+  }
+
+  async updateImageUrl(todoId: string, imageId: string): Promise<void> {
+    const bucketName = process.env.ATTACHMENT_S3_BUCKET
+    const imageUrl = `https://${bucketName}.s3.amazonaws.com/${imageId}`
+    const params = {
+      TableName: this.todosTable,
+      Key: {
+        todoId: todoId
+      },
+      UpdateExpression: "set #imageUrl = :imageUrl",
+      ExpressionAttributeNames: {
+          '#imageUrl': 'imageUrl',
+      },
+      ExpressionAttributeValues: {
+        ":imageUrl": imageUrl,
+      },
+    };
+
+    try {
+      await this.docClient.update(params).promise()
+      console.log(`Success - imageUrl updated for ${todoId}`);
+    } catch (err) {
+      console.log("Error", err);
+    }
+
+    return null
   }
 
   async deleteTodo(todoId: string): Promise<void> {
@@ -79,6 +112,8 @@ export class TodosAccess {
     } catch (err) {
       console.log("Error", err);
     }
+
+    return null
   }
 }
 
