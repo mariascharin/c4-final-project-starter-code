@@ -4,9 +4,9 @@ import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import * as uuid from 'uuid'
 import { createAttachmentPresignedUrl } from '../helpers/attachmentUtils'
-//import { createLogger } from '../utils/logger'
-//import * as createError from 'http-errors'
+import { createLogger } from '../utils/logger'
 
+const logger = createLogger('helpers/todo')
 const todosAccess = new TodosAccess()
 
 export async function getAllTodosForUser(userId: string): Promise<TodoItem[]> {
@@ -29,24 +29,30 @@ export async function createTodo(
     done,
   }
   const returnedTodo = await todosAccess.createTodo(todo)
+  logger.info('TODO was created', { returnedTodo })
   return returnedTodo
 }
 
 export async function updateTodo(
     todoId: string, todoUpdate: UpdateTodoRequest
 ): Promise<void> {
-  return await todosAccess.updateTodo(todoId, todoUpdate)
+  const updatedTodo = await todosAccess.updateTodo(todoId, todoUpdate)
+  logger.info('TODO was updated', { updatedTodo })
+  return updatedTodo
 }
 
 export async function generatePresignedAttachmentUrl(
   todoId: string
 ): Promise<string> {
   todosAccess.updateAttachmentUrl(todoId)
-  return await createAttachmentPresignedUrl(todoId)
+  const presignedUrl = await createAttachmentPresignedUrl(todoId)
+  logger.info('Presigned URL was created')
+  return presignedUrl
 }
 
 export async function deleteTodo(
   todoId: string
 ): Promise<void> {
-  return await todosAccess.deleteTodo(todoId)
+  await todosAccess.deleteTodo(todoId)
+  logger.info('TODO was deleted', { todoId })
 }

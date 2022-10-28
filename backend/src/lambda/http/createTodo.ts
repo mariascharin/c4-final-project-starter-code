@@ -14,7 +14,6 @@ export const handler = middy(
     const userId: string = getUserId(event)
 
     const todoItem: TodoItem = await createTodo(userId, newTodo)
-    console.log('todoItem ', todoItem);
 
     return {
       statusCode: 200,

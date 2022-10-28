@@ -2,23 +2,22 @@ import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
 import * as middy from 'middy'
 import { secretsManager } from 'middy/middlewares'
-
 import { verify } from 'jsonwebtoken'
 import { JwtPayload } from '../../auth/JwtPayload'
+import { createLogger } from '../../utils/logger'
 
+const logger = createLogger('auth')
 const secretId = process.env.AUTH_0_SECRET_ID
 const secretField = process.env.AUTH_0_SECRET_FIELD
 
 export const handler = middy(async (event: CustomAuthorizerEvent, context): Promise<CustomAuthorizerResult> => {
   try {
-    console.log('Calling auto0Authorizer, event ', event)
-    console.log('Calling auto0Authorizer, context ', context)
+    logger.info('Authorizing a user', event.authorizationToken)
     const decodedToken = verifyToken(
       event.authorizationToken,
       context.AUTH0_SECRET[secretField]
     )
-    console.log('User was authorized ', decodedToken)
-
+    logger.info('The user was authorized', { decodedToken })
     return {
       principalId: decodedToken.sub,
       policyDocument: {
@@ -33,7 +32,7 @@ export const handler = middy(async (event: CustomAuthorizerEvent, context): Prom
       }
     }
   } catch (e) {
-    console.log('User was not authorized', e.message)
+    logger.error('Problem occurred when trying to authorize a user', { error: e.message })
 
     return {
       principalId: 'user',

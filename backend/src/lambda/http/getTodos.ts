@@ -12,7 +12,6 @@ export const handler = middy(
 
     const userId: string = getUserId(event)
     const items: TodoItem[] = await getAllTodosForUser(userId)
-    console.log('items ', items);
 
     return {
       statusCode: 200,

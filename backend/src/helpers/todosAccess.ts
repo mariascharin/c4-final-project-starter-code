@@ -3,9 +3,9 @@ import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
-//import { createLogger } from '../utils/logger'
+import { createLogger } from '../utils/logger'
 
-//const logger = createLogger('TodosAccess')
+const logger = createLogger('helpers/TodosAccess')
 
 //const XAWS = AWSXRay.captureAWS(AWS)
 
@@ -18,8 +18,6 @@ export class TodosAccess {
   }
 
   async getAllTodosForUser(userId: string): Promise<TodoItem[]> {
-    console.log('Getting all TodoItems')
-
     const params = {
       TableName : this.todosTable,
       IndexName : this.userIdIndex,
@@ -28,22 +26,29 @@ export class TodosAccess {
           ':userId': userId
       }
     }
-
+    
     try {
       const result = await this.docClient.query(params).promise()
       const items = result.Items
+      logger.info('TODOs were fetched')
       return items as TodoItem[]
     } catch (err) {
-      console.log("Error", err);
+      logger.error('Problem occurred when fetching TODOs', { err })
     }
   }
 
   async createTodo(todo: TodoItem): Promise<TodoItem> {
-    await this.docClient.put({
+    const params = {
       TableName: this.todosTable,
       Item: todo
-    }).promise()
+    }
 
+    try {
+      await this.docClient.put(params).promise()
+      logger.info('TODO was updated', { todo })
+    } catch (err) {
+      logger.error('Problem occurred when creating TODO', { err })
+    }
     return todo
   }
 
@@ -69,11 +74,10 @@ export class TodosAccess {
 
     try {
       await this.docClient.update(params).promise()
-      console.log(`Success - todoId ${todoId} updated`);
+      logger.info('TODO was updated', { todoId })
     } catch (err) {
-      console.log("Error", err);
+      logger.info('Problem occurred when updating TODO', { err })
     }
-
     return null
   }
 
@@ -96,9 +100,9 @@ export class TodosAccess {
 
     try {
       await this.docClient.update(params).promise()
-      console.log(`Success - attachmentUrl updated for ${todoId}`);
+      logger.info('Attachment URL was updated', { todoId })
     } catch (err) {
-      console.log("Error", err);
+      logger.error('Problem occurred when updating attachment URL', { err })
     }
   }
 
@@ -113,9 +117,9 @@ export class TodosAccess {
     
     try {
       await this.docClient.delete(params).promise()
-      console.log(`Success - todoId ${todoId} deleted`);
+      logger.info('TODO was deleted', { todoId })
     } catch (err) {
-      console.log("Error", err);
+      logger.error('Problem occurred when deleting TODO', { err })
     }
 
     return null
