@@ -1,20 +1,17 @@
 import 'source-map-support/register'
-
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
-import { getAllTodos } from '../../helpers/todos'
+import { getAllTodosForUser } from '../../helpers/todos'
 import { TodoItem } from '../../models/TodoItem'
-
-//import { getTodosForUser as getTodosForUser } from '../../businessLogic/todos'
 import { getUserId } from '../utils';
 
-// TODO: Get all TODO items for a current user
+// Get all TODO items for the current user
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     const userId: string = getUserId(event)
-    const items: TodoItem[] = await getAllTodos(userId)
+    const items: TodoItem[] = await getAllTodosForUser(userId)
     console.log('items ', items);
 
     return {

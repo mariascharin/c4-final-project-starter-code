@@ -1,17 +1,13 @@
 import * as AWS from 'aws-sdk'
 //import * as AWSXRay from 'aws-xray-sdk-core'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
-//import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-//import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
-//import { UpdateTodoRequest } from '../requests/UpdateTodoRequest';
 import { TodoUpdate } from '../models/TodoUpdate';
+//import { createLogger } from '../utils/logger'
 
 //const logger = createLogger('TodosAccess')
 
 //const XAWS = AWSXRay.captureAWS(AWS)
-
-// const logger = createLogger('TodosAccess')
 
 export class TodosAccess {
 
@@ -21,7 +17,7 @@ export class TodosAccess {
     private readonly userIdIndex = process.env.TODOS_CREATED_BY_INDEX) {
   }
 
-  async getAllTodos(userId: string): Promise<TodoItem[]> {
+  async getAllTodosForUser(userId: string): Promise<TodoItem[]> {
     console.log('Getting all TodoItems')
 
     const params = {
@@ -81,31 +77,29 @@ export class TodosAccess {
     return null
   }
 
-  async updateImageUrl(todoId: string, imageId: string): Promise<void> {
+  async updateAttachmentUrl(todoId: string): Promise<void> {
     const bucketName = process.env.ATTACHMENT_S3_BUCKET
-    const imageUrl = `https://${bucketName}.s3.amazonaws.com/${imageId}`
+    const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}`
     const params = {
       TableName: this.todosTable,
       Key: {
         todoId: todoId
       },
-      UpdateExpression: "set #imageUrl = :imageUrl",
+      UpdateExpression: "set #attachmentUrl = :attachmentUrl",
       ExpressionAttributeNames: {
-          '#imageUrl': 'imageUrl',
+          '#attachmentUrl': 'attachmentUrl',
       },
       ExpressionAttributeValues: {
-        ":imageUrl": imageUrl,
+        ":attachmentUrl": attachmentUrl,
       },
     };
 
     try {
       await this.docClient.update(params).promise()
-      console.log(`Success - imageUrl updated for ${todoId}`);
+      console.log(`Success - attachmentUrl updated for ${todoId}`);
     } catch (err) {
       console.log("Error", err);
     }
-
-    return null
   }
 
   async deleteTodo(todoId: string): Promise<void> {

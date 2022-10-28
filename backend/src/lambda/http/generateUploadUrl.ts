@@ -1,24 +1,18 @@
 import 'source-map-support/register'
-
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
+import { generatePresignedAttachmentUrl } from '../../helpers/todos'
 
-import { createAttachmentPresignedUrl } from '../../helpers/attachmentUtils'
-import { updateImageUrl } from '../../helpers/todos'
-//import { createAttachmentPresignedUrl } from '../../businessLogic/todos'
-//import { getUserId } from '../utils'
-
+// Return a presigned URL to upload a file for a TODO item with the provided id
+// Each TODO item can have exactly one image, thus we can use todoId as imageId
+// Update TODO item with attachmentUrl
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-    // also update todoId item with imageId and imageUrl (https://${bucketName}.s3.amazonaws.com/${imageId})
-    
-    console.log('generateUploadUrl function, event: ', event)
     
     const todoId = event.pathParameters.todoId
-    const imageId = await updateImageUrl(todoId)
-    const uploadUrl = await createAttachmentPresignedUrl(imageId)
+    // Each TODO item can 
+    const uploadUrl = generatePresignedAttachmentUrl(todoId)
 
     return {
       statusCode: 200,
