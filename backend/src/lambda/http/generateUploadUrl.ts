@@ -2,7 +2,7 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
-import { generatePresignedAttachmentUrl } from '../../helpers/todos'
+import { generatePresignedAttachmentUrl } from '../../businessLogic/todos'
 
 // Return a presigned URL to upload a file for a TODO item with the provided id
 // Each TODO item can have exactly one image, thus we can use todoId as imageId

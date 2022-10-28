@@ -1,9 +1,9 @@
-import { TodosAccess } from './todosAccess'
+import * as uuid from 'uuid'
+import { createAttachmentPresignedUrl } from '../dataLayer/attachmentUtils'
+import { TodosAccess } from '../dataLayer/todosAccess'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import * as uuid from 'uuid'
-import { createAttachmentPresignedUrl } from '../helpers/attachmentUtils'
 import { createLogger } from '../utils/logger'
 
 const logger = createLogger('helpers/todo')
