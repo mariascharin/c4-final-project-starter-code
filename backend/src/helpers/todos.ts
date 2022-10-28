@@ -12,12 +12,12 @@ import * as uuid from 'uuid'
 
 const todosAccess = new TodosAccess()
 
-export async function getAllTodos(): Promise<TodoItem[]> {
-  return await todosAccess.getAllTodos()
+export async function getAllTodos(userId: string): Promise<TodoItem[]> {
+  return await todosAccess.getAllTodos(userId)
 }
 
 export async function createTodo(
-    createTodoRequest: CreateTodoRequest
+    userId: string, createTodoRequest: CreateTodoRequest
 ): Promise<TodoItem> {
   //const userId = getUserId(jwtToken)
   const todoId = uuid.v4()
@@ -25,6 +25,7 @@ export async function createTodo(
   const { name, dueDate } = createTodoRequest
   const done = false
   const todo = {
+    userId,
     todoId,
     createdAt,
     name,

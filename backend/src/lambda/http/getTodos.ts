@@ -7,16 +7,14 @@ import { getAllTodos } from '../../helpers/todos'
 import { TodoItem } from '../../models/TodoItem'
 
 //import { getTodosForUser as getTodosForUser } from '../../businessLogic/todos'
-//import { getUserId } from '../utils';
+import { getUserId } from '../utils';
 
 // TODO: Get all TODO items for a current user
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    // Write your code here
-    //const todos = '...'
 
-    console.log('getTodos function, event: ', event)
-    const items: TodoItem[] = await getAllTodos()
+    const userId: string = getUserId(event)
+    const items: TodoItem[] = await getAllTodos(userId)
     console.log('items ', items);
 
     return {
