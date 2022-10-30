@@ -6,7 +6,7 @@ import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 
-const logger = createLogger('helpers/todo')
+const logger = createLogger('businessLogic/todo')
 const todosAccess = new TodosAccess()
 
 export async function getAllTodosForUser(userId: string): Promise<TodoItem[]> {
@@ -34,25 +34,25 @@ export async function createTodo(
 }
 
 export async function updateTodo(
-    todoId: string, todoUpdate: UpdateTodoRequest
+  userId: string, todoId: string, todoUpdate: UpdateTodoRequest
 ): Promise<void> {
-  const updatedTodo = await todosAccess.updateTodo(todoId, todoUpdate)
+  const updatedTodo = await todosAccess.updateTodo(userId, todoId, todoUpdate)
   logger.info('TODO was updated', { updatedTodo })
   return updatedTodo
 }
 
 export async function generatePresignedAttachmentUrl(
-  todoId: string
+  userId: string, todoId: string
 ): Promise<string> {
-  todosAccess.updateAttachmentUrl(todoId)
+  todosAccess.updateAttachmentUrl(userId, todoId)
   const presignedUrl = await createAttachmentPresignedUrl(todoId)
   logger.info('Presigned URL was created')
   return presignedUrl
 }
 
 export async function deleteTodo(
-  todoId: string
+  userId: string, todoId: string
 ): Promise<void> {
-  await todosAccess.deleteTodo(todoId)
+  await todosAccess.deleteTodo(userId, todoId)
   logger.info('TODO was deleted', { todoId })
 }

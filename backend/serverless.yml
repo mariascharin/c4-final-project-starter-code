@@ -19,7 +19,7 @@ provider:
     apiGateway: true
 
   environment:
-    TODOS_TABLE: Todos-${self:provider.stage}
+    TODOS_TABLE: TodosTable-${self:provider.stage}
     TODOS_CREATED_BY_INDEX: CreatedByIndex-${self:provider.stage}
     ATTACHMENT_S3_BUCKET: serverless-marias-todo-images-${self:provider.stage}
     AUTH_0_SECRET_ID: TODOAuth0Secret-${self:provider.stage}
@@ -156,8 +156,10 @@ resources:
           - AttributeName: userId
             AttributeType: S
         KeySchema:
-          - AttributeName: todoId
+          - AttributeName: userId
             KeyType: HASH
+          - AttributeName: todoId
+            KeyType: RANGE
         GlobalSecondaryIndexes:
           - IndexName: ${self:provider.environment.TODOS_CREATED_BY_INDEX}
             KeySchema:

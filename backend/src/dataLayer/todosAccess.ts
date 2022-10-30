@@ -5,7 +5,7 @@ import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
 import { createLogger } from '../utils/logger'
 
-const logger = createLogger('helpers/TodosAccess')
+const logger = createLogger('dataLayer/TodosAccess')
 const XAWS = AWSXRay.captureAWS(AWS)
 
 export class TodosAccess {
@@ -51,11 +51,12 @@ export class TodosAccess {
     return todo
   }
 
-  async updateTodo(todoId: string, todoUpdate: TodoUpdate): Promise<void> {
+  async updateTodo(userId: string, todoId: string, todoUpdate: TodoUpdate): Promise<void> {
     const { name, dueDate, done } = todoUpdate
     const params = {
       TableName: this.todosTable,
       Key: {
+        userId: userId,
         todoId: todoId
       },
       UpdateExpression: "set #dueDate = :dueDate, #done = :done, #name = :name",
@@ -80,12 +81,13 @@ export class TodosAccess {
     return null
   }
 
-  async updateAttachmentUrl(todoId: string): Promise<void> {
+  async updateAttachmentUrl(userId:string, todoId: string): Promise<void> {
     const bucketName = process.env.ATTACHMENT_S3_BUCKET
     const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}`
     const params = {
       TableName: this.todosTable,
       Key: {
+        userId: userId,
         todoId: todoId
       },
       UpdateExpression: "set #attachmentUrl = :attachmentUrl",
@@ -105,11 +107,12 @@ export class TodosAccess {
     }
   }
 
-  async deleteTodo(todoId: string): Promise<void> {
+  async deleteTodo(userId: string, todoId: string): Promise<void> {
 
     const params = {
       TableName: this.todosTable,
       Key: {
+        userId,
         todoId
       },
     };
